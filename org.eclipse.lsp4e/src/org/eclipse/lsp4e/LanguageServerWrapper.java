@@ -244,6 +244,7 @@ public class LanguageServerWrapper {
 			if (isActive()) {
 				return;
 			} else {
+				LanguageServerPlugin.getDefault().getLog().info("LS `" + serverDefinition.id + "' is NOT active. STOP it"); //$NON-NLS-1$ //$NON-NLS-2$
 				for (Entry<URI, DocumentContentSynchronizer> entry : this.connectedDocuments.entrySet()) {
 					filesToReconnect.put(entry.getKey(), entry.getValue().getDocument());
 				}
@@ -251,6 +252,7 @@ public class LanguageServerWrapper {
 			}
 		}
 		if (this.initializeFuture == null) {
+			LanguageServerPlugin.getDefault().getLog().info("Starting LS '" + serverDefinition.id + "'"); //$NON-NLS-1$ //$NON-NLS-2$
 			final URI rootURI = getRootURI();
 			this.launcherFuture = new CompletableFuture<>();
 			this.initializeFuture = CompletableFuture.supplyAsync(() -> {
@@ -320,6 +322,7 @@ public class LanguageServerWrapper {
 			}).exceptionally(e -> {
 				LanguageServerPlugin.logError(e);
 				initializeFuture.completeExceptionally(e);
+				LanguageServerPlugin.getDefault().getLog().info("Exception occurred during LS `" + serverDefinition.id + "' startup. STOP it"); //$NON-NLS-1$ //$NON-NLS-2$
 				stop();
 				return null;
 			});
@@ -405,6 +408,7 @@ public class LanguageServerWrapper {
 		timer.schedule(new TimerTask() {
 			@Override
 			public void run() {
+				LanguageServerPlugin.getDefault().getLog().info("Stopping LS '" + serverDefinition.id + "' after stoppage time out"); //$NON-NLS-1$ //$NON-NLS-2$
 				stop();
 			}
 		}, TimeUnit.SECONDS.toMillis(this.serverDefinition.lastDocumentDisconnectedTimeout));
@@ -425,6 +429,7 @@ public class LanguageServerWrapper {
 		if (alreadyStopping) {
 			return;
 		}
+		LanguageServerPlugin.getDefault().getLog().info("Stopping LS `" + serverDefinition.id + "'."); //$NON-NLS-1$ //$NON-NLS-2$
 		removeStopTimer();
 		if (this.initializeFuture != null) {
 			this.initializeFuture.cancel(true);
@@ -636,6 +641,7 @@ public class LanguageServerWrapper {
 				removeStopTimer();
 				startStopTimer();
 			} else {
+				LanguageServerPlugin.getDefault().getLog().info("Stopping LS '" + serverDefinition.id + "' after disconnecting doc " + uri); //$NON-NLS-1$ //$NON-NLS-2$
 				stop();
 			}
 		}
